@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/health")
-public class HealthController {
+public class RestHealthController {
 
     @Autowired
     private Optional<BuildProperties> build;

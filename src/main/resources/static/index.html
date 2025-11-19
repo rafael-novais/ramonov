@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>WebSocket Hello</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<h1>WS Hello</h1>
+<input id="name" placeholder="seu nome" />
+<button onclick="connect()">Conectar</button>
+<button onclick="sendHello()">Enviar Hello</button>
+
+<ul id="messages"></ul>
+
+<script>
+    let stompClient = null;
+
+    function connect() {
+      const socket = new SockJS('/ws'); // conecta ao endpoint registrado
+      stompClient = Stomp.over(socket);
+      stompClient.connect({}, function(frame) {
+        console.log('Conectado: ' + frame);
+        // inscreve em /topic/greetings
+        stompClient.subscribe('/topic/greetings', function(greeting) {
+          const body = JSON.parse(greeting.body).content;
+          const li = document.createElement('li');
+          li.appendChild(document.createTextNode(body));
+          document.getElementById('messages').appendChild(li);
+        });
+      });
+    }
+
+    function sendHello() {
+      const name = document.getElementById('name').value;
+      stompClient.send("/app/hello", {}, JSON.stringify({ 'name': name }));
+    }
+  </script>
+</body>
+</html>
